@@ -1,4 +1,5 @@
 let btnAgregar = document.getElementById("btnAgregar");
+let btnClear = document.getElementById("btnClear");
 let txtNombre = document.getElementById("Name");
 let txtNumber = document.getElementById("Number");
 let alertValidaciones = document.getElementById("alertValidaciones");
@@ -15,6 +16,7 @@ let precio = 0;
 let costoTotal =0;
 let totalEnProductos= 0;
 
+let datos = new Array();
 
 function validarCantidad() {
   if (txtNumber.value.length == 0) {
@@ -72,6 +74,15 @@ btnAgregar.addEventListener("click", function (event) {
     <td>${txtNumber.value}</td>
     <td>${precio}</td> 
     </tr> `;
+
+  let elemento = {"contador":contador,
+    "nombre": txtNombre.value,
+    "cantidad": txtNumber.value,
+    "precio": precio}; 
+
+    datos.push(elemento);
+    localStorage.setItem("datos", JSON.stringify(datos));
+
     cuerpoTabla.insertAdjacentHTML("beforeend", row);
     costoTotal += precio * Number(txtNumber.value);
     totalEnProductos += Number(txtNumber.value);
@@ -89,6 +100,36 @@ btnAgregar.addEventListener("click", function (event) {
     txtNumber.value = "";
     txtNombre.focus();
   } //isValid
+});// btnAgregar.addEventListener
+btnClear.addEventListener("click", function(event){
+  event.preventDefault();
+  //Limpiar el valor de los campos
+  txtNombre.value="";
+  txtNumber.value="";
+  //Limpiar localStoroge
+  //localStorage.removeItem("contador")
+  //localStorage.removeItem("costoTotal")
+  //localStorage.removeItem("totalEnProductos")
+  //Elimina todo el contenido del localStorege
+  localStorage.clear();
+  //Limpiar tabla
+  cuerpoTabla.innerHTML="";
+  //Reiniciar las variables,contador,costoTotal,totalEn Productos
+  contador=0;
+  costoTotal=0;
+  totalEnProductos=0;
+  //Asiganar las variables a los divs
+  contadorProductos.innerText = contador;
+  productosTotal.innerText=totalEnProductos; 
+  precioTotal.innerText="$" + costoTotal.toFixed(2);
+  //Ocultar alerta
+  alertValidacionesTexto.innerHTML = "";
+  alertValidaciones.style.display = "none";
+  //Quitar bordes 
+  txtNombre.style.border = "";
+  txtNumber.style.border = "";
+  //Manda el foco al campo nommbre
+  txtNombre.focus();
 });
 
 txtNombre.addEventListener("blur", function (event) {
@@ -101,17 +142,35 @@ txtNumber.addEventListener("blur", function (event) {
   txtNumber.value = txtNumber.value.trim();
 }); ///---------------------------
 
-window.addEventListener("load", fuction(){
-  if (this.localStorage.getItem("contador") !=null){
-    contador = Number(this. localStorage.getItem("contador"))
-  }// null
-  if (this.localStorage.getItem("totalEnProductos") !=null) {
-totalEnProductos= Number(this.localStorage.getItem)("totalEnProductos")
-  } (this.localStorage.getItem("costoTotal") !=null){
-    costoTotal=Number(this.localStorage.getItem("costoTotal"))
-  }//null
-
+window.addEventListener("load", function(){
+  if (this.localStorage.getItem("contador") != null){ //para saber si hay datos que cargar 
+   contador = Number(localStorage.getItem("contador"));
+   contador = Number(this.localStorage.getItem("contador"));
+  } //!null
+  if (this.localStorage.getItem("totalEnProductos") != null){
+   totalEnProductos = Number(localStorage.getItem("totalEnProductos"));
+   totalEnProductos = Number(this.localStorage.getItem("totalEnProductos"));
+  } //!null
+  if (this.localStorage.getItem("costoTotal") != null){
+   costoTotal = Number(localStorage.getItem("costoTotal"));
+   costoTotal = Number(this.localStorage.getItem("costoTotal"));
+  } //!null
   contadorProductos.innerText = contador;
-  productosTotal.innerText = totalEnProductos;
-  precioTotal.innerText = "$" + costoTotal.toFixed(2);
-})
+  productosTotal.innerText=totalEnProductos; 
+  precioTotal.innerText="$" + costoTotal.toFixed(2);
+   
+  if(this.localStorage.getItem("datos") != null){
+    datos = JSON.parse(this.localStorage.getItem("datos"))
+  } // != null
+  datos.forEach (r => {
+    let row =`<tr>
+                <td>${r.contador}</td>
+                <td>${r.nombre}</td>
+                <td>${r.cantidad}</td>
+                <td>${r.precio}</td>
+              </tr>`; 
+  cuerpoTabla.insertAdjacentHTML("beforeend", row);
+  });
+
+});//window load
+
